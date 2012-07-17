@@ -6,8 +6,7 @@ example assumes you have already installed node on your system.
 ```bash
 git clone git://github.com/craigjackson/socket.io-chat.git
 cd socket.io-chat
-npm install express
-npm install socket.io
+npm install .
 node chat.js
 ```
 
