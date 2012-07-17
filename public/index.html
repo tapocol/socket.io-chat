@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.io Chat</title>
+    <script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect("http://localhost:8080");
+
+      $(function() {
+        var messages = $("#messages");
+        var nicknames = $("#nicknames");
+
+        socket.on("joined", function(data) {
+          messages.append("<div class=\"message announcement joined\"><span id=\"nickname-" + data.nickname + "\" class=\"nickname\">" + data.nickname + "</span> has joined</div>");
+          refresh_nicknames();
+        });
+
+        socket.on("name change", function(data) {
+          messages.append("<div class=\"message announcement name-change\"><span id=\"nickname-" + data.old_nickname + "\" class=\"old nickname\">" + data.old_nickname + "</span> has changed nickname to <span id=\"nickname-" + data.nickname + "\" class=\"nickname\">" + data.nickname + "</span></div>");
+          refresh_nicknames();
+        });
+
+        socket.on("message", function(data) {
+          messages.append("<div class=\"message\"><span id=\"nickname-" + data.nickname + "\" class=\"nickname\">" + data.nickname + "</span>: " + data.message + "</div>");
+        });
+
+        socket.on("left", function(data) {
+          messages.append("<div class=\"message announcement left\"><span id=\"nickname-" + data.nickname + "\" class=\"nickname\">" + data.nickname + "</span> has left</div>");
+          refresh_nicknames();
+        });
+
+        function refresh_nicknames() {
+          socket.emit("nicknames", function(data) {
+            nicknames.empty();
+            for (var nickname in data.nicknames) {
+              nicknames.append("<div id=\"nickname-" + nickname + "\" class=\"nickname\">" + nickname + "</div>");
+            }
+          });
+        }
+        refresh_nicknames();
+
+        $("#send-message").click(function() {
+          socket.emit("message", $("#message").val(), function(err) {
+            if (err) {
+              console.log("Could not send message: " + err);
+            }
+          });
+          $("#message").val("");
+        });
+
+        $("#change-nickname").click(function() {
+          socket.emit("nickname", $("#nickname").val(), function(err) {
+            if (err) {
+              $("#nickname").val("");
+              console.log("Could not change nickname: " + err);
+            }
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Socket.io Chat</h1>
+    <div id="messages"></div>
+    <input id="message" type="text" name="message" value="" placeholder="Enter message" />
+    <button id="send-message">Send Message</button>
+    <div id="nicknames"></div>
+    <input id="nickname" type="text" name="nickname" value="" placeholder="Pick a nickname" />
+    <button id="change-nickname">Change Nickname</button>
+  </body>
+</html>
+

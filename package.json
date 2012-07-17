@@ -1,0 +1,11 @@
+{
+  "name": "socket.io-chat",
+  "version": "0.1.0",
+  "description": "Using socket.io for websockets in a chat application.",
+  "author": "Craig Jackson <tapocol@gmail.com>",
+  "dependencies": {
+    "express": "3.0.0beta7",
+    "socket.io": "0.9.6"
+  }
+}
+
